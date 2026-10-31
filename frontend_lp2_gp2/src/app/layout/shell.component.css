@@ -1,1 +1,18 @@
-/* Estilos propios del componente (el diseño general usa Tailwind) */
+/* Sección activa de la barra lateral */
+.nav-item.nav-active {
+  background: linear-gradient(135deg, #1F3D2B 0%, #16301F 100%);
+  color: #FFFDF8;
+  box-shadow: 0 8px 18px -10px rgba(22, 48, 31, .7);
+}
+.nav-item.nav-active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: #8A9A52;
+}
+.nav-item.nav-active .nav-ico { color: #CBD4A0; }
+.nav-item.nav-active .nav-count { background: rgba(255, 253, 248, .16); color: #FFFDF8; }

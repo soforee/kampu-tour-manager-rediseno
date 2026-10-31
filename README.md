@@ -10,6 +10,22 @@ proyecto/
 └── pruebas-e2e/        Prueba de punta a punta con Playwright (navegador → Angular → API → Oracle)
 ```
 
+## Rediseño visual del frontend (UI/UX)
+
+Esta versión solo cambia la **apariencia** del frontend (`frontend_lp2_gp2`). El backend, la base de datos, la API,
+los servicios, las rutas y la lógica de los componentes son los mismos; la prueba `pruebas-e2e/e2e.js` pasa completa (23/23).
+
+- **Sistema de diseño** (`src/index.html` + `src/styles.css`): esquinas redondeadas, sombras suaves, paleta KAMPU
+  (verde bosque, oliva y arena) y clases reutilizables: `btn-dark` (principal), `btn-brand` (guardar/confirmar),
+  `btn-light` (secundario/cancelar), `btn-danger` (eliminar/anular), `icon-btn*`, `field`, `label`/`label req`,
+  `form-section`, `form-actions`, `card`, `tbl`, `seg`/`seg-btn` (filtros), `alert-*`, `empty`, `progress`, `chip`.
+- **Barra lateral fija y compacta**: en escritorio muestra solo los iconos y se expande suavemente al pasar el cursor
+  (o con el teclado), resaltando la sección activa; en móvil se abre como menú lateral.
+- **Formularios** organizados en secciones, con campos obligatorios (`*`) y opcionales marcados, foco visible,
+  selects y fechas estilizados.
+- **Tablas, tarjetas, KPIs, modales y alertas (SweetAlert2)** rediseñados, con animaciones discretas
+  (se desactivan si el sistema pide "reducir movimiento") y diseño responsive.
+
 ## 1. Base de datos (Oracle)
 
 1. Crea (o usa) el usuario dueño del esquema. Por defecto el backend usa `LP2` / `admin123` en `localhost:1522/XE`.

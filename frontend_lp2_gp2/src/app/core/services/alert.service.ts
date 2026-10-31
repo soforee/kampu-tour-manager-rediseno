@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
 
-const BRAND = '#16301F';
-const DANGER = '#e11d48';
+const BRAND = '#1F3D2B';
+const DANGER = '#E11D48';
+const CANCEL = '#FFFDF8'; // botón secundario claro (ver estilos .swal2-cancel en styles.css)
 
 @Injectable({ providedIn: 'root' })
 export class AlertService {
@@ -17,7 +18,7 @@ export class AlertService {
   async confirm(message: string, title: string = '¿Estás seguro?', confirmText: string = 'Sí, continuar'): Promise<boolean> {
     const result = await Swal.fire({
       title, text: message, icon: 'warning', showCancelButton: true,
-      confirmButtonColor: BRAND, cancelButtonColor: '#76705A',
+      confirmButtonColor: BRAND, cancelButtonColor: CANCEL, reverseButtons: true,
       confirmButtonText: confirmText, cancelButtonText: 'Cancelar'
     });
     return result.isConfirmed;
@@ -29,7 +30,7 @@ export class AlertService {
     options.forEach(o => (inputOptions[o] = o));
     const result = await Swal.fire({
       title, text, input: 'select', inputOptions, inputPlaceholder: 'Selecciona una opción',
-      showCancelButton: true, confirmButtonColor: DANGER, cancelButtonColor: '#76705A',
+      showCancelButton: true, confirmButtonColor: DANGER, cancelButtonColor: CANCEL, reverseButtons: true,
       confirmButtonText: 'Anular reserva', cancelButtonText: 'Volver',
       inputValidator: v => (v ? null : 'Elige una opción')
     });
