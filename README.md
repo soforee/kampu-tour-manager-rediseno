@@ -2,18 +2,17 @@
 
 ```
 proyecto/
-├── lp2_gp2/            Backend Spring Boot 3.4 (Java 21) — API REST en http://localhost:8082/lp2_gp2
+├── kampu-backend/      Backend Spring Boot 3.4 (Java 21) — API REST en http://localhost:8082/lp2_gp2
 │   └── src/main/resources/db/
 │       ├── 01_schema.sql   Script de tablas (el original; un solo ajuste, ver "Hallazgos")
 │       └── 02_data.sql     Datos de demostración (los mismos que tenía el frontend en seed.ts)
-├── frontend_lp2_gp2/   Frontend Angular 18 (el diseño y las pantallas no cambian)
-└── pruebas-e2e/        Prueba de punta a punta con Playwright (navegador → Angular → API → Oracle)
+└── kampu-frontend/     Frontend Angular 18 (el diseño y las pantallas no cambian)
 ```
 
 ## Rediseño visual del frontend (UI/UX)
 
-Esta versión solo cambia la **apariencia** del frontend (`frontend_lp2_gp2`). El backend, la base de datos, la API,
-los servicios, las rutas y la lógica de los componentes son los mismos; la prueba `pruebas-e2e/e2e.js` pasa completa (23/23).
+Esta versión solo cambia la **apariencia** del frontend (`kampu-frontend`). El backend, la base de datos, la API,
+los servicios, las rutas y la lógica de los componentes son los mismos.
 
 - **Sistema de diseño** (`src/index.html` + `src/styles.css`): esquinas redondeadas, sombras suaves, paleta KAMPU
   (verde bosque, oliva y arena) y clases reutilizables: `btn-dark` (principal), `btn-brand` (guardar/confirmar),
@@ -30,8 +29,8 @@ los servicios, las rutas y la lógica de los componentes son los mismos; la prue
 
 1. Crea (o usa) el usuario dueño del esquema. Por defecto el backend usa `LP2` / `admin123` en `localhost:1522/XE`.
 2. Conectado como ese usuario (SQL Developer o SQL*Plus), ejecuta **en orden**:
-   1. `lp2_gp2/src/main/resources/db/01_schema.sql`
-   2. `lp2_gp2/src/main/resources/db/02_data.sql` (opcional, carga los datos demo y hace `COMMIT`)
+   1. `kampu-backend/src/main/resources/db/01_schema.sql`
+   2. `kampu-backend/src/main/resources/db/02_data.sql` (opcional, carga los datos demo y hace `COMMIT`)
 
    En SQL Developer usa **"Ejecutar script" (F5)**, no "Ejecutar sentencia" (el trigger termina en `/`).
    En SQL*Plus, para que las tildes se guarden bien: `set NLS_LANG=AMERICAN_AMERICA.AL32UTF8` antes de entrar.
@@ -40,7 +39,7 @@ los servicios, las rutas y la lógica de los componentes son los mismos; la prue
 > `02_data.sql` usa IDs fijos (para que coincidan las relaciones) y al final reinicia las identidades con
 > `ALTER TABLE ... MODIFY ... (START WITH LIMIT VALUE)`, para que los registros nuevos continúen desde el último ID.
 
-## 2. Backend (`lp2_gp2`)
+## 2. Backend (`kampu-backend`)
 
 Conexión en `src/main/resources/application.yaml`. Puedes editarla ahí o usar variables de entorno:
 
@@ -53,7 +52,7 @@ Conexión en `src/main/resources/application.yaml`. Puedes editarla ahí o usar 
 Ejemplos de URL: Oracle XE 21c → `jdbc:oracle:thin:@localhost:1521/XEPDB1`; Oracle 23 Free → `jdbc:oracle:thin:@localhost:1521/FREEPDB1`.
 
 ```bash
-cd lp2_gp2
+cd kampu-backend
 ./mvnw spring-boot:run
 ```
 
@@ -62,12 +61,11 @@ cd lp2_gp2
 - Swagger: http://localhost:8082/lp2_gp2/swagger-ui/index.html (haz login en `POST /api/v1/auth/login`, copia el `token` y pégalo en **Authorize**).
 - Imágenes de paquetes: se guardan en la carpeta `images/` (propiedad `storage.location`) y se sirven en `/lp2_gp2/images/...`.
 - `spring.jpa.hibernate.ddl-auto` está en **`none`**: Hibernate no crea ni altera tablas; manda el script.
-- Pruebas: `./mvnw test` (usa H2 en modo Oracle con el mismo script; no necesita Oracle).
 
-## 3. Frontend (`frontend_lp2_gp2`)
+## 3. Frontend (`kampu-frontend`)
 
 ```bash
-cd frontend_lp2_gp2
+cd kampu-frontend
 npm install
 npm start
 ```
@@ -137,17 +135,7 @@ no se eliminan registros en uso (cliente con reservas, paquete/guía/transporte 
 4. **Contraseñas:** el frontend usaba SHA-256 sin sal en el navegador. Ahora `password_hash` guarda **BCrypt** y la
    verificación se hace en el servidor; la clave nunca se compara en el navegador.
 
-## 7. Pruebas realizadas
-
-- **Backend** (`./mvnw test`): 10 pruebas de integración — login/401, CRUD de catálogos, duplicados (409), validaciones,
-  salidas (capacidad, cruces, cupos), reservas, pagos en PEN/USD, aprobar/rechazar, confirmar/completar/anular con
-  reembolso, eliminaciones protegidas, subida y borrado de imágenes, logout.
-- **Oracle 23 Free real**: `01_schema.sql` + `02_data.sql` ejecutados sin errores; API probada contra Oracle.
-- **Punta a punta** (`pruebas-e2e/e2e.js`): 23 verificaciones en navegador sobre Angular + backend + Oracle.
-  Para repetirla: con todo en marcha y la BD recién cargada, `npm i -D playwright && npx playwright install chromium`
-  y luego `node pruebas-e2e/e2e.js`.
-
-## 8. Pendientes / decisiones a confirmar
+## 7. Pendientes / decisiones a confirmar
 
 - **Roles:** `ADMIN` y `VENTAS` tienen hoy los mismos permisos (el frontend no los diferencia). Si se necesita, se puede
   restringir por rol en el backend (por ejemplo, que solo `ADMIN` elimine o anule).
