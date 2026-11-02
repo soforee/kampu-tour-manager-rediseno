@@ -10,9 +10,6 @@
     </div>
 
     <div class="relative max-w-md animate-fade-up [animation-delay:120ms]">
-      <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20 backdrop-blur text-[11px] font-extrabold uppercase tracking-[0.14em] text-leaf-200 mb-5">
-        <app-icon name="mountain" size="w-3.5 h-3.5" /> Giras · Expediciones · Eventos al aire libre
-      </div>
       <h1 class="text-4xl xl:text-5xl font-extrabold font-wide leading-[1.08] tracking-tight">Cada salida, reserva y pago en un solo lugar.</h1>
       <p class="mt-5 text-zinc-200/90 leading-relaxed">Controla cupos en tiempo real, cobra con claridad y mantén a tus pasajeros y guías sincronizados.</p>
     </div>
@@ -34,41 +31,35 @@
     </div>
   </div>
 
-  <!-- Formulario -->
-  <section class="relative flex items-start lg:items-center justify-center px-5 pb-10 sm:px-12 lg:py-12 -mt-6 lg:mt-0">
-    <div class="w-full max-w-md rounded-3xl bg-white p-7 sm:p-9 shadow-lifted border border-zinc-200/60 animate-pop-in">
+  <!-- Formulario (minimalista) -->
+  <section class="relative flex items-start lg:items-center justify-center px-6 pt-8 pb-12 sm:px-12 lg:py-12 -mt-6 lg:mt-0 rounded-t-3xl lg:rounded-none bg-sand-50 lg:bg-transparent">
+    <div class="w-full max-w-sm animate-fade-up">
 
-      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-700 grid place-items-center mb-5 ring-1 ring-brand-100">
-        <app-icon name="lock" size="w-5 h-5" />
-      </div>
-      <h2 class="text-2xl font-extrabold font-wide tracking-tight text-zinc-900">Bienvenido de nuevo</h2>
-      <p class="mt-1.5 text-sm text-zinc-500">Ingresa con tu cuenta para gestionar la agencia.</p>
+      <h2 class="text-[28px] sm:text-[32px] font-black tracking-tight text-zinc-900 leading-tight">Bienvenido de nuevo</h2>
+      <p class="mt-2 text-[15px] text-zinc-500">Ingresa con tu cuenta para gestionar la agencia.</p>
 
-      <form class="mt-8 space-y-5" (ngSubmit)="entrar()">
+      <form class="mt-10 space-y-5" (ngSubmit)="entrar()">
         <div>
-          <label class="label req" for="login-user">Usuario</label>
-          <div class="search">
-            <span class="search-icon"><app-icon name="user" size="w-4 h-4" /></span>
-            <input id="login-user" type="text" name="username" [(ngModel)]="username" maxlength="50" autocomplete="username" placeholder="tu usuario"
-                   class="field !py-3" [class.!border-rose-300]="error() && !username.trim()">
-          </div>
+          <label class="mb-2 block text-[13px] font-bold text-zinc-700" for="login-user">Usuario</label>
+          <input id="login-user" type="text" name="username" [(ngModel)]="username" maxlength="50" autocomplete="username" placeholder="Tu usuario"
+                 class="h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-[15px] text-zinc-900 outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-brand-500 focus:shadow-ring"
+                 [class.!border-rose-300]="error() && !username.trim()">
         </div>
         <div>
-          <label class="label req" for="login-pass">Contraseña</label>
-          <div class="search">
-            <span class="search-icon"><app-icon name="lock" size="w-4 h-4" /></span>
-            <input id="login-pass" [type]="ver() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="••••••••"
-                   class="field !py-3 !pr-20" [class.!border-rose-300]="error() && !password">
-            <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 transition-colors"
-                    (click)="ver.set(!ver())"><app-icon name="eye" size="w-3.5 h-3.5" />{{ ver() ? 'Ocultar' : 'Ver' }}</button>
+          <div class="mb-2 flex items-center justify-between">
+            <label class="text-[13px] font-bold text-zinc-700" for="login-pass">Contraseña</label>
+            <button type="button" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition-colors" (click)="ver.set(!ver())">{{ ver() ? 'Ocultar' : 'Mostrar' }}</button>
           </div>
+          <input id="login-pass" [type]="ver() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="••••••••"
+                 class="h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-[15px] text-zinc-900 outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-brand-500 focus:shadow-ring"
+                 [class.!border-rose-300]="error() && !password">
         </div>
 
         @if (error()) {
-          <div class="alert-error" role="alert"><app-icon name="alert" size="w-4 h-4" /><span>{{ error() }}</span></div>
+          <p class="flex items-center gap-2 text-sm font-semibold text-rose-600 animate-fade-in" role="alert"><app-icon name="alert" size="w-4 h-4 shrink-0" />{{ error() }}</p>
         }
 
-        <button type="submit" [disabled]="cargando()" class="btn-dark w-full !py-3">
+        <button type="submit" [disabled]="cargando()" class="btn-brand w-full !h-12 !rounded-xl !text-[15px] !mt-8">
           @if (cargando()) {
             <span class="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span> Ingresando…
           } @else {
@@ -77,13 +68,17 @@
         </button>
       </form>
 
-      <div class="mt-8 rounded-2xl border border-dashed border-zinc-200 bg-sand-50/70 p-4">
-        <div class="eyebrow mb-2.5 flex items-center gap-1.5"><app-icon name="sparkles" size="w-3.5 h-3.5" /> Cuentas de demostración</div>
-        <div class="flex flex-wrap gap-2">
-          <button type="button" class="btn-light btn-sm !rounded-full" (click)="rellenar('admin', 'admin123')"><app-icon name="user" size="w-3.5 h-3.5" /> Administrador</button>
-          <button type="button" class="btn-light btn-sm !rounded-full" (click)="rellenar('ventas', 'ventas123')"><app-icon name="tag" size="w-3.5 h-3.5" /> Ventas</button>
+      <div class="mt-10">
+        <div class="flex items-center gap-3 text-xs font-semibold text-zinc-400">
+          <span class="h-px flex-1 bg-zinc-200"></span>o entra con una cuenta demo<span class="h-px flex-1 bg-zinc-200"></span>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <button type="button" class="h-11 rounded-xl border border-zinc-200 bg-white/60 text-sm font-bold text-zinc-700 transition hover:border-brand-300 hover:bg-white hover:text-brand-700" (click)="rellenar('admin', 'admin123')">Administrador</button>
+          <button type="button" class="h-11 rounded-xl border border-zinc-200 bg-white/60 text-sm font-bold text-zinc-700 transition hover:border-brand-300 hover:bg-white hover:text-brand-700" (click)="rellenar('ventas', 'ventas123')">Ventas</button>
         </div>
       </div>
+
+      <p class="mt-12 text-center text-xs text-zinc-400">Kampu · Tour Manager</p>
     </div>
   </section>
 </div>
