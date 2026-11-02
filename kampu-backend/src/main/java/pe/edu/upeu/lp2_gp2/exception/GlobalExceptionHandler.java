@@ -1,7 +1,9 @@
 package pe.edu.upeu.lp2_gp2.exception;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pe.edu.upeu.lp2_gp2.dto.ErrorDTO;
+
+import java.time.LocalDate;
+import java.util.Map;
 
 /** Convierte las excepciones en {status, error, timestamp}; el frontend muestra "error". */
 @RestControllerAdvice
@@ -67,9 +72,37 @@ public class GlobalExceptionHandler {
         return responder(HttpStatus.BAD_REQUEST, mensaje);
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
-    public ResponseEntity<ErrorDTO> formato(Exception e) {
+    /** Nombres legibles de los campos para los mensajes de formato. */
+    private static final Map<String, String> CAMPOS = Map.ofEntries(
+            Map.entry("dias", "días"), Map.entry("noches", "noches"), Map.entry("precioBase", "precio base"),
+            Map.entry("capacidad", "capacidad"), Map.entry("cuposMaximos", "cupos máximos"), Map.entry("monto", "monto"),
+            Map.entry("fechaInicio", "fecha de inicio"), Map.entry("fechaFin", "fecha fin"),
+            Map.entry("fechaNacimiento", "fecha de nacimiento"), Map.entry("paqueteId", "paquete"),
+            Map.entry("clienteId", "cliente"), Map.entry("salidaId", "salida"), Map.entry("guiaId", "guía"),
+            Map.entry("transporteId", "transporte"), Map.entry("reservaId", "reserva"));
+
+    /** JSON con un tipo incorrecto (p. ej. letras o decimales en un campo entero, o una fecha mal escrita). */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorDTO> formato(HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof MismatchedInputException mie && !mie.getPath().isEmpty()) {
+            String campo = mie.getPath().get(mie.getPath().size() - 1).getFieldName();
+            Class<?> tipo = mie.getTargetType();
+            if (campo != null) {
+                String nombre = CAMPOS.getOrDefault(campo, campo);
+                String esperado = tipo == null ? "un valor válido"
+                        : (tipo == Integer.class || tipo == int.class || tipo == Long.class || tipo == long.class) ? "un número entero"
+                        : Number.class.isAssignableFrom(tipo) ? "un número"
+                        : tipo == LocalDate.class ? "una fecha válida (AAAA-MM-DD)"
+                        : "un valor válido";
+                return responder(HttpStatus.BAD_REQUEST, "El campo " + nombre + " debe ser " + esperado + ".");
+            }
+        }
         return responder(HttpStatus.BAD_REQUEST, "El formato de los datos enviados no es válido.");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorDTO> parametro(MethodArgumentTypeMismatchException e) {
+        return responder(HttpStatus.BAD_REQUEST, "El parámetro " + e.getName() + " no tiene un formato válido.");
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

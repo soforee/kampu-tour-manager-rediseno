@@ -1,5 +1,6 @@
 package pe.edu.upeu.lp2_gp2.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -7,6 +8,7 @@ import java.math.BigDecimal;
 public record PaqueteTourRequestDTO(
         @NotBlank(message = "El nombre es obligatorio.")
         @Size(max = 100, message = "El nombre admite máximo 100 caracteres.")
+        @Pattern(regexp = Reglas.TEXTO, message = "El nombre del paquete contiene caracteres no permitidos.")
         String nombre,
         @Size(max = 1000, message = "La descripción admite máximo 1000 caracteres.")
         String descripcion,
@@ -27,4 +29,9 @@ public record PaqueteTourRequestDTO(
         @Pattern(regexp = "ACTIVO|INACTIVO", message = "El estado debe ser ACTIVO o INACTIVO.")
         String estado
 ) {
+    @JsonIgnore
+    @AssertTrue(message = "Las noches no pueden ser más que los días.")
+    public boolean isNochesCoherentes() {
+        return dias == null || noches == null || noches <= dias;
+    }
 }

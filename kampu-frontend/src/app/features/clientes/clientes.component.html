@@ -55,20 +55,20 @@
       <p class="text-xs text-zinc-500">Los campos marcados con <span class="font-bold text-rose-500">*</span> son obligatorios.</p>
       <div class="form-section">
         <div class="form-section-title"><app-icon name="id" size="w-4 h-4" /> Datos personales</div>
-        <div><label class="label req">Nombre completo</label><input class="field" maxlength="150" [(ngModel)]="form.nombreCompleto" placeholder="Ej. María Quispe Huamán"></div>
+        <div><label class="label req">Nombre completo</label><input class="field" maxlength="150" [(ngModel)]="form.nombreCompleto" placeholder="Ej. María Quispe Huamán" (blur)="v.tocar('nombre')" [class.field-invalid]="v.error('nombre')" kpFiltro="nombre" autocomplete="name">@if (v.error('nombre'); as e) { <p class="field-error">{{ e }}</p> }</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label class="label req">Tipo doc.</label>
-            <select class="field" [(ngModel)]="form.tipoDocumento">@for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }</select>
+            <select class="field" [(ngModel)]="form.tipoDocumento" (ngModelChange)="v.tocar('documento')">@for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }</select>
           </div>
-          <div class="sm:col-span-2"><label class="label req">N° de documento</label><input class="field" maxlength="20" [(ngModel)]="form.numeroDocumento"></div>
+          <div class="sm:col-span-2"><label class="label req">N° de documento</label><input class="field" [maxlength]="form.tipoDocumento === 'DNI' ? 8 : 12" [(ngModel)]="form.numeroDocumento" (blur)="v.tocar('documento')" [class.field-invalid]="v.error('documento')" [kpFiltro]="form.tipoDocumento === 'DNI' ? 'dni' : 'alfanumerico'" [attr.inputmode]="form.tipoDocumento === 'DNI' ? 'numeric' : null">@if (v.error('documento'); as e) { <p class="field-error">{{ e }}</p> }</div>
         </div>
       </div>
       <div class="form-section">
         <div class="form-section-title"><app-icon name="mail" size="w-4 h-4" /> Contacto</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="label">Correo <span class="opt">Opcional</span></label><input type="email" class="field" maxlength="100" [(ngModel)]="form.email" placeholder="correo@ejemplo.com"></div>
-          <div><label class="label">Teléfono <span class="opt">Opcional</span></label><input class="field" maxlength="20" [(ngModel)]="form.telefono" placeholder="+51 9xx xxx xxx"></div>
+          <div><label class="label">Correo <span class="opt">Opcional</span></label><input type="email" class="field" maxlength="100" [(ngModel)]="form.email" placeholder="correo@ejemplo.com" (blur)="v.tocar('email')" [class.field-invalid]="v.error('email')" inputmode="email" autocomplete="email">@if (v.error('email'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div><label class="label">Teléfono <span class="opt">Opcional</span></label><input class="field" maxlength="20" [(ngModel)]="form.telefono" placeholder="+51 9xx xxx xxx" (blur)="v.tocar('telefono')" [class.field-invalid]="v.error('telefono')" type="tel" kpFiltro="telefono" inputmode="tel">@if (v.error('telefono'); as e) { <p class="field-error">{{ e }}</p> }</div>
         </div>
       </div>
       <div class="form-actions">

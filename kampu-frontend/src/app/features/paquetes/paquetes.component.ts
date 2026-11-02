@@ -9,13 +9,15 @@ import { PaqueteTour } from '../../core/models';
 import { hoy } from '../../core/utils/date.util';
 import { BadgeComponent } from '../../shared/badge.component';
 import { IconComponent } from '../../shared/icon.component';
+import { FiltroDirective } from '../../shared/filtro.directive';
+import { FormValidacion, V } from '../../core/utils/validacion';
 import { LogoComponent } from '../../shared/logo.component';
 import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-paquetes',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe, BadgeComponent, IconComponent, LogoComponent, ModalComponent],
+  imports: [FormsModule, RouterLink, CurrencyPipe, BadgeComponent, IconComponent, FiltroDirective, LogoComponent, ModalComponent],
   templateUrl: './paquetes.component.html',
   styleUrl: './paquetes.component.css'
 })
@@ -35,6 +37,14 @@ export class PaquetesComponent {
   quitar = signal(false);
   editId: number | null = null;
   form: Omit<PaqueteTour, 'paqueteId'> = this.vacio();
+  v = new FormValidacion<'nombre' | 'descripcion' | 'dias' | 'noches' | 'precio'>(() => ({
+    nombre: V.texto(this.form.nombre, 'El nombre', 100, true),
+    descripcion: (this.form.descripcion ?? '').length > 1000 ? 'La descripción admite máximo 1000 caracteres.' : null,
+    dias: V.entero(this.form.dias, 'Los días', 1, 99),
+    noches: V.entero(this.form.noches, 'Las noches', 0, 99)
+      ?? (this.form.noches > this.form.dias ? 'Las noches no pueden ser más que los días.' : null),
+    precio: V.importe(this.form.precioBase, 'El precio base')
+  }));
 
   private vacio(): Omit<PaqueteTour, 'paqueteId'> {
     return { nombre: '', descripcion: '', precioBase: 0, dias: 1, noches: 0, imagen: '', estado: 'ACTIVO' };
@@ -83,7 +93,7 @@ export class PaquetesComponent {
 
   quitarImagen() { this.nuevaImagen.set(null); this.quitar.set(true); }
 
-  nuevo() { this.editId = null; this.form = this.vacio(); this.reiniciarImagen(); this.abierto.set(true); }
+  nuevo() { this.editId = null; this.form = this.vacio(); this.reiniciarImagen(); this.v.reiniciar(); this.abierto.set(true); }
 
   private reiniciarImagen() { this.nuevaImagen.set(null); this.quitar.set(false); }
 
@@ -92,6 +102,7 @@ export class PaquetesComponent {
     this.editId = paqueteId;
     this.form = { ...resto, imagen: this.imagenes.url(resto.imagen) ? resto.imagen : '' };
     this.reiniciarImagen();
+    this.v.reiniciar();
     this.abierto.set(true);
   }
 
@@ -103,10 +114,7 @@ export class PaquetesComponent {
   async guardar() {
     if (this.store.ocupado()) return;
     const f = this.form;
-    if (!f.nombre.trim()) { this.alerts.error('El nombre es obligatorio.'); return; }
-    if (!Number.isInteger(f.dias) || f.dias < 1 || f.dias > 99) { this.alerts.error('Los días deben estar entre 1 y 99.'); return; }
-    if (!Number.isInteger(f.noches) || f.noches < 0 || f.noches > 99) { this.alerts.error('Las noches deben estar entre 0 y 99.'); return; }
-    if (!(f.precioBase > 0)) { this.alerts.error('El precio base debe ser mayor a 0.'); return; }
+    if (!this.v.valido()) { this.alerts.toast('Revisa los campos marcados en rojo', 'error'); return; }
 
     // Imagen: se sube al backend y la ruta resultante es lo que se guarda en la columna IMAGEN.
     // El backend borra el archivo anterior cuando la imagen cambia o se quita.
@@ -119,7 +127,7 @@ export class PaquetesComponent {
     } else if (this.quitar()) {
       imagen = '';
     }
-    const res = await this.store.guardarPaquete({ ...f, nombre: f.nombre.trim(), imagen }, this.editId ?? undefined);
+    const res = await this.store.guardarPaquete({ ...f, nombre: f.nombre.trim(), descripcion: (f.descripcion ?? '').trim(), imagen }, this.editId ?? undefined);
     if (!res.ok) { this.alerts.error(res.error!); return; }
     this.abierto.set(false);
     this.alerts.toast(this.editId ? 'Paquete actualizado' : 'Paquete creado');

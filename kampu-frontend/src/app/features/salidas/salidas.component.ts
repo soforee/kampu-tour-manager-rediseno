@@ -7,12 +7,14 @@ import { EstadoSalida, SalidaForm } from '../../core/models';
 import { addDays, hoy } from '../../core/utils/date.util';
 import { BadgeComponent } from '../../shared/badge.component';
 import { IconComponent } from '../../shared/icon.component';
+import { FiltroDirective } from '../../shared/filtro.directive';
+import { FormValidacion, V } from '../../core/utils/validacion';
 import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-salidas',
   standalone: true,
-  imports: [FormsModule, DatePipe, BadgeComponent, IconComponent, ModalComponent],
+  imports: [FormsModule, DatePipe, BadgeComponent, IconComponent, FiltroDirective, ModalComponent],
   templateUrl: './salidas.component.html',
   styleUrl: './salidas.component.css'
 })
@@ -27,6 +29,18 @@ export class SalidasComponent {
   abierto = signal(false);
   editId: number | null = null;
   form: SalidaForm = this.vacio();
+  v = new FormValidacion<'paquete' | 'inicio' | 'fin' | 'cupos' | 'transporte'>(() => {
+    const f = this.form;
+    const t = this.store.getTransporte(f.transporteId);
+    return {
+      paquete: f.paqueteId ? null : 'Selecciona un paquete.',
+      inicio: V.fecha(f.fechaInicio, 'La fecha de inicio'),
+      fin: V.fecha(f.fechaFin, 'La fecha fin')
+        ?? (f.fechaInicio && f.fechaFin < f.fechaInicio ? 'La fecha fin no puede ser anterior a la fecha de inicio.' : null),
+      cupos: V.entero(f.cuposMaximos, 'Los cupos máximos', 1, 999),
+      transporte: t && f.cuposMaximos > t.capacidad ? `Los cupos (${f.cuposMaximos}) superan la capacidad del transporte (${t.capacidad}).` : null
+    };
+  });
 
   private vacio(): SalidaForm {
     return { paqueteId: 0, fechaInicio: hoy(), fechaFin: hoy(), cuposMaximos: 10, guiaId: null, transporteId: null, estado: 'PROGRAMADA' };
@@ -46,12 +60,13 @@ export class SalidasComponent {
       }));
   });
 
-  nuevo() { this.editId = null; this.form = this.vacio(); this.abierto.set(true); }
+  nuevo() { this.editId = null; this.form = this.vacio(); this.v.reiniciar(); this.abierto.set(true); }
 
   editar(id: number) {
     const { salidaId, cuposDisponibles, ...resto } = this.store.getSalida(id)!;
     this.editId = salidaId;
     this.form = { ...resto };
+    this.v.reiniciar();
     this.abierto.set(true);
   }
 
@@ -63,6 +78,7 @@ export class SalidasComponent {
 
   async guardar() {
     if (this.store.ocupado()) return;
+    if (!this.v.valido()) { this.alerts.toast('Revisa los campos marcados en rojo', 'error'); return; }
     const res = await this.store.guardarSalida(this.form, this.editId ?? undefined);
     if (!res.ok) { this.alerts.error(res.error!); return; }
     this.abierto.set(false);

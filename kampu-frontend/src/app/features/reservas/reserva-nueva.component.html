@@ -16,29 +16,29 @@
       <div class="grid sm:grid-cols-2 gap-4">
         <div>
           <label class="label req">Cliente</label>
-          <select class="field" [(ngModel)]="clienteId">
+          <select class="field" [(ngModel)]="clienteId" (blur)="v.tocar('cliente')" [class.field-invalid]="v.error('cliente')">
             <option [ngValue]="null" disabled>Selecciona un cliente</option>
             @for (c of store.clientes(); track c.clienteId) {
               <option [ngValue]="c.clienteId">{{ c.nombreCompleto }}</option>
             }
-          </select>
+          </select>@if (v.error('cliente'); as e) { <p class="field-error">{{ e }}</p> }
           <a routerLink="/clientes" class="link text-xs mt-2"><app-icon name="plus" size="w-3 h-3" /> ¿Cliente nuevo? Regístralo primero</a>
         </div>
         <div>
           <label class="label req">Salida</label>
-          <select class="field" [(ngModel)]="salidaId">
+          <select class="field" [(ngModel)]="salidaId" (blur)="v.tocar('salida')" [class.field-invalid]="v.error('salida')">
             <option [ngValue]="null" disabled>Selecciona una salida</option>
             @for (s of salidasDisponibles; track s.salidaId) {
               <option [ngValue]="s.salidaId">
                 {{ store.getPaquete(s.paqueteId)?.nombre }} · {{ s.fechaInicio | date:'dd/MM/yyyy' }} · {{ s.cuposDisponibles }} cupos
               </option>
             }
-          </select>
+          </select>@if (v.error('salida'); as e) { <p class="field-error">{{ e }}</p> }
         </div>
       </div>
       <div class="mt-4">
         <label class="label">Observaciones <span class="opt">Opcional · {{ observaciones.length }}/200</span></label>
-        <textarea class="field" rows="2" maxlength="200" [(ngModel)]="observaciones" placeholder="Alergias, habitación, solicitudes especiales…"></textarea>
+        <textarea class="field" rows="2" maxlength="200" [(ngModel)]="observaciones" placeholder="Alergias, habitación, solicitudes especiales…" (blur)="v.tocar('observaciones')" [class.field-invalid]="v.error('observaciones')"></textarea>@if (v.error('observaciones'); as e) { <p class="field-error">{{ e }}</p> }
       </div>
     </section>
 
@@ -64,25 +64,25 @@
             <div class="grid sm:grid-cols-6 gap-3">
               <div class="sm:col-span-6">
                 <label class="label req">Nombre completo</label>
-                <input class="field" [(ngModel)]="p.nombreCompleto" maxlength="150">
+                <input class="field" [(ngModel)]="p.nombreCompleto" maxlength="150" (blur)="v.tocar('p' + i + 'nombre')" [class.field-invalid]="v.error('p' + i + 'nombre')" kpFiltro="nombre">@if (v.error('p' + i + 'nombre'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
               <div class="sm:col-span-2">
                 <label class="label req">Tipo doc.</label>
-                <select class="field" [(ngModel)]="p.tipoDocumento">
+                <select class="field" [(ngModel)]="p.tipoDocumento" (ngModelChange)="v.tocar('p' + i + 'documento')">
                   @for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }
                 </select>
               </div>
               <div class="sm:col-span-4">
                 <label class="label req">N° de documento</label>
-                <input class="field" [(ngModel)]="p.numeroDocumento" maxlength="20">
+                <input class="field" [(ngModel)]="p.numeroDocumento" [maxlength]="p.tipoDocumento === 'DNI' ? 8 : 12" (blur)="v.tocar('p' + i + 'documento')" [class.field-invalid]="v.error('p' + i + 'documento')" [kpFiltro]="p.tipoDocumento === 'DNI' ? 'dni' : 'alfanumerico'" [attr.inputmode]="p.tipoDocumento === 'DNI' ? 'numeric' : null">@if (v.error('p' + i + 'documento'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
               <div class="sm:col-span-3">
                 <label class="label">Nacionalidad <span class="opt">Opcional</span></label>
-                <input class="field" [(ngModel)]="p.nacionalidad" maxlength="50">
+                <input class="field" [(ngModel)]="p.nacionalidad" maxlength="50" (blur)="v.tocar('p' + i + 'nacionalidad')" [class.field-invalid]="v.error('p' + i + 'nacionalidad')" kpFiltro="nombre">@if (v.error('p' + i + 'nacionalidad'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
               <div class="sm:col-span-3">
                 <label class="label">Fecha de nacimiento <span class="opt">Opcional</span></label>
-                <input type="date" class="field" [max]="ayer" [(ngModel)]="p.fechaNacimiento">
+                <input type="date" class="field" [max]="ayer" [(ngModel)]="p.fechaNacimiento" (blur)="v.tocar('p' + i + 'nacimiento')" [class.field-invalid]="v.error('p' + i + 'nacimiento')" min="1900-01-01">@if (v.error('p' + i + 'nacimiento'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
             </div>
           </div>
@@ -115,7 +115,7 @@
         <span class="text-zinc-500 text-sm font-medium">Total</span>
         <span class="text-2xl font-extrabold font-wide tracking-tight text-zinc-900">{{ total | currency:'S/ ' }}</span>
       </div>
-      <button type="button" class="btn-brand w-full mt-5 !py-3" [disabled]="!puedeGuardar" (click)="guardar()"><app-icon name="check" size="w-4 h-4" /> Crear reserva</button>
+      <button type="button" class="btn-brand w-full mt-5 !py-3" [disabled]="store.ocupado()" (click)="guardar()"><app-icon name="check" size="w-4 h-4" /> Crear reserva</button>
       <p class="text-xs text-zinc-400 mt-3 text-center leading-relaxed">Se crea como pendiente y descuenta los cupos de la salida.</p>
     </div>
   </aside>

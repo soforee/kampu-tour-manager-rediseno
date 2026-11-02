@@ -15,8 +15,10 @@ public record PagoRequestDTO(
         @Pattern(regexp = "PEN|USD|EUR", message = "La moneda debe ser PEN, USD o EUR.")
         String moneda,
         @Size(max = 50, message = "El método de pago admite máximo 50 caracteres.")
+        @Pattern(regexp = Reglas.TEXTO, message = "El método de pago contiene caracteres no permitidos.")
         String metodoPago,
         @Size(max = 100, message = "El código de transacción admite máximo 100 caracteres.")
+        @Pattern(regexp = Reglas.CODIGO, message = "El código de transacción solo admite letras, números y . _ / # -")
         String codigoTransaccion,
         @NotNull(message = "El estado de la transacción es obligatorio.")
         @Pattern(regexp = "PENDIENTE|APROBADO|RECHAZADO", message = "Un pago nuevo solo puede ser PENDIENTE, APROBADO o RECHAZADO.")

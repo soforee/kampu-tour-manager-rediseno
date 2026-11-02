@@ -60,19 +60,19 @@
 
       <div class="form-section">
         <div class="form-section-title"><app-icon name="file-text" size="w-4 h-4" /> Información general</div>
-        <div><label class="label req">Nombre</label><input class="field" maxlength="100" [(ngModel)]="form.nombre" placeholder="Ej. Camino Inca clásico"></div>
+        <div><label class="label req">Nombre</label><input class="field" maxlength="100" [(ngModel)]="form.nombre" placeholder="Ej. Camino Inca clásico" (blur)="v.tocar('nombre')" [class.field-invalid]="v.error('nombre')">@if (v.error('nombre'); as e) { <p class="field-error">{{ e }}</p> }</div>
         <div>
           <label class="label">Descripción <span class="opt">Opcional · {{ form.descripcion.length }}/1000</span></label>
-          <textarea class="field" rows="3" maxlength="1000" [(ngModel)]="form.descripcion" placeholder="Qué incluye, puntos destacados, nivel de dificultad…"></textarea>
+          <textarea class="field" rows="3" maxlength="1000" [(ngModel)]="form.descripcion" placeholder="Qué incluye, puntos destacados, nivel de dificultad…" (blur)="v.tocar('descripcion')" [class.field-invalid]="v.error('descripcion')"></textarea>@if (v.error('descripcion'); as e) { <p class="field-error">{{ e }}</p> }
         </div>
       </div>
 
       <div class="form-section">
         <div class="form-section-title"><app-icon name="tag" size="w-4 h-4" /> Duración y precio</div>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div><label class="label req">Días</label><input type="number" min="1" max="99" class="field" [(ngModel)]="form.dias" (ngModelChange)="sugerirNoches()"></div>
-          <div><label class="label req">Noches</label><input type="number" min="0" max="99" class="field" [(ngModel)]="form.noches"></div>
-          <div class="col-span-2 sm:col-span-1"><label class="label req">Precio base (S/)</label><input type="number" min="0" step="0.01" class="field" [(ngModel)]="form.precioBase"></div>
+          <div><label class="label req">Días</label><input type="number" min="1" max="99" class="field" [(ngModel)]="form.dias" (ngModelChange)="sugerirNoches()" (blur)="v.tocar('dias')" [class.field-invalid]="v.error('dias')" kpFiltro="entero" inputmode="numeric" step="1">@if (v.error('dias'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div><label class="label req">Noches</label><input type="number" min="0" max="99" class="field" [(ngModel)]="form.noches" (blur)="v.tocar('noches')" [class.field-invalid]="v.error('noches')" kpFiltro="entero" inputmode="numeric" step="1">@if (v.error('noches'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div class="col-span-2 sm:col-span-1"><label class="label req">Precio base (S/)</label><input type="number" min="0" step="0.01" class="field" [(ngModel)]="form.precioBase" (blur)="v.tocar('precio')" [class.field-invalid]="v.error('precio')" kpFiltro="decimal" inputmode="decimal">@if (v.error('precio'); as e) { <p class="field-error">{{ e }}</p> }</div>
         </div>
       </div>
 

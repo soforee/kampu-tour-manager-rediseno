@@ -7,11 +7,13 @@ import { AlertService } from '../../core/services/alert.service';
 import { PasajeroDraft, TipoDocumento } from '../../core/models';
 import { hoy } from '../../core/utils/date.util';
 import { IconComponent } from '../../shared/icon.component';
+import { FiltroDirective } from '../../shared/filtro.directive';
+import { FormValidacion, V } from '../../core/utils/validacion';
 
 @Component({
   selector: 'app-reserva-nueva',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, IconComponent],
+  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, IconComponent, FiltroDirective],
   templateUrl: './reserva-nueva.component.html',
   styleUrl: './reserva-nueva.component.css'
 })
@@ -26,6 +28,26 @@ export class ReservaNuevaComponent implements OnInit {
   salidaId: number | null = null;
   observaciones = '';
   pasajeros: PasajeroDraft[] = [this.vacio()];
+  v = new FormValidacion(() => {
+    const e: Record<string, string | null> = {
+      cliente: this.clienteId ? null : 'Selecciona un cliente.',
+      salida: this.salidaId ? null : 'Selecciona una salida.',
+      observaciones: this.observaciones.length > 200 ? 'Las observaciones admiten máximo 200 caracteres.' : null
+    };
+    const docs = new Set<string>();
+    this.pasajeros.forEach((p, i) => {
+      const doc = p.numeroDocumento.trim().toUpperCase();
+      e['p' + i + 'nombre'] = V.nombrePersona(p.nombreCompleto, 'El nombre del pasajero');
+      e['p' + i + 'documento'] = V.documento(p.tipoDocumento, p.numeroDocumento)
+        ?? (docs.has(doc) ? 'Este documento ya está en otro pasajero de la reserva.' : null);
+      if (doc) docs.add(doc);
+      e['p' + i + 'nacionalidad'] = V.nacionalidad(p.nacionalidad);
+      e['p' + i + 'nacimiento'] = V.fecha(p.fechaNacimiento, 'La fecha de nacimiento', false)
+        ?? (p.fechaNacimiento && p.fechaNacimiento > this.ayer ? 'La fecha de nacimiento debe ser anterior a hoy.' : null)
+        ?? (p.fechaNacimiento && p.fechaNacimiento < '1900-01-01' ? 'La fecha de nacimiento no puede ser anterior a 1900.' : null);
+    });
+    return e;
+  });
 
   /** Fecha máxima de nacimiento: la BD exige fecha_nacimiento < hoy */
   ayer = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return d.toISOString().slice(0, 10); })();
@@ -71,10 +93,13 @@ export class ReservaNuevaComponent implements OnInit {
   }
 
   async guardar() {
-    if (!this.puedeGuardar) return;
+    if (this.store.ocupado()) return;
+    if (!this.v.valido() || this.excede) { this.alerts.toast('Revisa los campos marcados en rojo', 'error'); return; }
     const res = await this.store.crearReserva({
-      clienteId: this.clienteId!, salidaId: this.salidaId!,
-      observaciones: this.observaciones, pasajeros: this.pasajeros
+      clienteId: this.clienteId!, salidaId: this.salidaId!, observaciones: this.observaciones.trim(),
+      pasajeros: this.pasajeros.map(p => ({
+        ...p, nombreCompleto: p.nombreCompleto.trim(), numeroDocumento: p.numeroDocumento.trim(), nacionalidad: p.nacionalidad.trim()
+      }))
     });
     if (!res.ok) { this.alerts.error(res.error!); return; }
     this.alerts.toast('Reserva creada');

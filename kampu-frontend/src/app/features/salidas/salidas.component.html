@@ -57,20 +57,20 @@
         <div class="form-section-title"><app-icon name="package" size="w-4 h-4" /> Paquete y fechas</div>
         <div>
           <label class="label req">Paquete</label>
-          <select class="field" [(ngModel)]="form.paqueteId" (ngModelChange)="sugerirFin()">
+          <select class="field" [(ngModel)]="form.paqueteId" (ngModelChange)="sugerirFin()" (blur)="v.tocar('paquete')" [class.field-invalid]="v.error('paquete')">
             <option [ngValue]="0" disabled>Selecciona un paquete</option>
             @for (p of store.paquetes(); track p.paqueteId) { <option [ngValue]="p.paqueteId">{{ p.nombre }} ({{ p.dias }}D / {{ p.noches }}N)</option> }
-          </select>
+          </select>@if (v.error('paquete'); as e) { <p class="field-error">{{ e }}</p> }
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="label req">Fecha inicio</label><input type="date" class="field" [(ngModel)]="form.fechaInicio" (ngModelChange)="sugerirFin()"></div>
-          <div><label class="label req">Fecha fin</label><input type="date" class="field" [min]="form.fechaInicio" [(ngModel)]="form.fechaFin"><p class="hint">Se sugiere según la duración del paquete.</p></div>
+          <div><label class="label req">Fecha inicio</label><input type="date" class="field" [(ngModel)]="form.fechaInicio" (ngModelChange)="sugerirFin()" (blur)="v.tocar('inicio')" [class.field-invalid]="v.error('inicio')">@if (v.error('inicio'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div><label class="label req">Fecha fin</label><input type="date" class="field" [min]="form.fechaInicio" [(ngModel)]="form.fechaFin" (blur)="v.tocar('fin')" [class.field-invalid]="v.error('fin')">@if (v.error('fin'); as e) { <p class="field-error">{{ e }}</p> }@if (!v.error('fin')) { <p class="hint">Se sugiere según la duración del paquete.</p> }</div>
         </div>
       </div>
       <div class="form-section">
         <div class="form-section-title"><app-icon name="users" size="w-4 h-4" /> Capacidad y estado</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="label req">Cupos máximos</label><input type="number" min="1" max="999" class="field" [(ngModel)]="form.cuposMaximos"></div>
+          <div><label class="label req">Cupos máximos</label><input type="number" min="1" max="999" class="field" [(ngModel)]="form.cuposMaximos" (blur)="v.tocar('cupos')" [class.field-invalid]="v.error('cupos')" kpFiltro="entero" inputmode="numeric" step="1">@if (v.error('cupos'); as e) { <p class="field-error">{{ e }}</p> }</div>
           <div>
             <label class="label req">Estado</label>
             <select class="field" [(ngModel)]="form.estado">
@@ -92,10 +92,10 @@
           </div>
           <div>
             <label class="label">Transporte</label>
-            <select class="field" [(ngModel)]="form.transporteId">
+            <select class="field" [(ngModel)]="form.transporteId" (blur)="v.tocar('transporte')" [class.field-invalid]="v.error('transporte')">
               <option [ngValue]="null">Sin asignar</option>
               @for (t of store.transportes(); track t.transporteId) { <option [ngValue]="t.transporteId">{{ t.marcaModelo }} · {{ t.placa }} ({{ t.capacidad }})</option> }
-            </select>
+            </select>@if (v.error('transporte'); as e) { <p class="field-error">{{ e }}</p> }
           </div>
         </div>
       </div>

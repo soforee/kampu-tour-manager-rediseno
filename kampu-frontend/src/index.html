@@ -77,6 +77,10 @@
       .label.req::after { content: '*'; @apply text-rose-500 font-bold; }
       .opt { @apply ml-auto text-[11px] font-normal text-zinc-400; }
       .hint { @apply mt-1.5 text-xs text-zinc-500 leading-relaxed; }
+      /* Validación: campo con error y mensaje debajo */
+      .field-invalid { @apply !border-rose-400 bg-rose-50/40 focus:!border-rose-500 focus:!shadow-[0_0_0_4px_rgba(225,29,72,.12)]; }
+      .field-error { @apply mt-1.5 flex items-start gap-1.5 text-xs font-semibold leading-snug text-rose-600 animate-fade-in; }
+      .field-error::before { content: '!'; @apply mt-px grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full bg-rose-500 text-[9px] font-black text-white; }
       .form-section { @apply rounded-xl border border-zinc-100 bg-sand-50/70 p-4 space-y-4; }
       .form-section-title { @apply flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-zinc-500; }
       .form-section-title svg { @apply text-brand-600; }

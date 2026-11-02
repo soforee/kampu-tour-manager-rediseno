@@ -8,16 +8,18 @@ import { EstadoTransaccion, Moneda } from '../../core/models';
 import { aPEN, TASAS } from '../../core/utils/moneda';
 import { BadgeComponent } from '../../shared/badge.component';
 import { IconComponent } from '../../shared/icon.component';
+import { FiltroDirective } from '../../shared/filtro.directive';
+import { FormValidacion, V } from '../../core/utils/validacion';
 
 @Component({
   selector: 'app-reserva-detalle',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, BadgeComponent, IconComponent],
+  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe, BadgeComponent, IconComponent, FiltroDirective],
   templateUrl: './reserva-detalle.component.html',
   styleUrl: './reserva-detalle.component.css'
 })
 export class ReservaDetalleComponent {
-  private store = inject(TourStore);
+  store = inject(TourStore);
   private alerts = inject(AlertService);
   private router = inject(Router);
   private id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
@@ -31,6 +33,12 @@ export class ReservaDetalleComponent {
   metodo = 'Efectivo';
   codigo = '';
   estadoTx: EstadoTransaccion = 'APROBADO';
+  v = new FormValidacion<'monto' | 'codigo'>(() => ({
+    monto: V.importe(this.monto, 'El monto')
+      ?? (this.estadoTx === 'APROBADO' && this.equivalente() > this.saldo() + 0.005
+        ? `El pago (S/ ${this.equivalente().toFixed(2)}) excede el saldo pendiente (S/ ${this.saldo().toFixed(2)}).` : null),
+    codigo: V.codigo(this.codigo)
+  }));
 
   reserva = computed(() => this.store.getReserva(this.id));
   codReserva = computed(() => this.store.codigoReserva(this.id));
@@ -95,11 +103,12 @@ export class ReservaDetalleComponent {
 
   async registrarPago() {
     if (this.store.ocupado()) return;
+    if (!this.v.valido()) { this.alerts.toast('Revisa los campos marcados en rojo', 'error'); return; }
     const ok = await this.resultado(this.store.registrarPago({
-      reservaId: this.id, monto: this.monto ?? 0, moneda: this.moneda, metodoPago: this.metodo,
-      codigoTransaccion: this.codigo, estadoTransaccion: this.estadoTx
+      reservaId: this.id, monto: this.monto!, moneda: this.moneda, metodoPago: this.metodo,
+      codigoTransaccion: this.codigo.trim(), estadoTransaccion: this.estadoTx
     }), 'Pago registrado');
-    if (ok) { this.monto = null; this.codigo = ''; this.estadoTx = 'APROBADO'; }
+    if (ok) { this.monto = null; this.codigo = ''; this.estadoTx = 'APROBADO'; this.v.reiniciar(); }
   }
 
   resolver(pagoId: number, estado: 'APROBADO' | 'RECHAZADO') {

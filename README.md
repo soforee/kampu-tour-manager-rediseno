@@ -26,6 +26,28 @@ los servicios, las rutas y la lógica de los componentes son los mismos.
 - **Tablas, tarjetas, KPIs, modales y alertas (SweetAlert2)** rediseñados, con animaciones discretas
   (se desactivan si el sistema pide "reducir movimiento") y diseño responsive.
 
+## Validación de formularios (frontend + backend)
+
+Las mismas reglas se aplican en ambos lados: `kampu-frontend/src/app/core/utils/validacion.ts` y
+`kampu-backend/src/main/java/pe/edu/upeu/lp2_gp2/dto/Reglas.java`.
+
+| Campo | Regla |
+|---|---|
+| Nombres de personas (cliente, guía, pasajero) | Letras (con tildes y ñ), espacios y `. ' -` |
+| DNI / CE / Pasaporte | DNI: 8 dígitos · CE: 8 a 12 letras o números · Pasaporte: 6 a 12 letras o números |
+| Teléfono (opcional) | Números con `+ ( ) -`, entre 6 y 15 dígitos |
+| Correo (opcional) | Formato `nombre@dominio.com` |
+| Placa | Letras, números y guion (3 a 15) |
+| Días / noches / cupos / capacidad | Enteros: 1–99 / 0–99 (y noches ≤ días) / 1–999 / 1–999 |
+| Precio base / monto | Mayor a 0, máximo 2 decimales (cabe en `NUMBER(10,2)`); el pago aprobado no puede exceder el saldo |
+| Fecha de nacimiento (opcional) | Anterior a hoy y desde 1900 |
+
+- En el navegador, la directiva `kpFiltro` (`shared/filtro.directive.ts`) impide escribir o pegar caracteres inválidos
+  (por ejemplo letras o la "e" en campos numéricos) y los mensajes aparecen debajo de cada campo.
+- En el backend, Bean Validation rechaza los datos con estado 400 y un mensaje claro; si llega un tipo incorrecto
+  (letras o decimales en un campo entero, fechas mal escritas) se indica qué campo falló.
+- La base de datos no necesitó cambios: los tipos y longitudes de `01_schema.sql` coinciden con estas reglas.
+
 ## 1. Base de datos (Oracle)
 
 1. Crea (o usa) el usuario dueño del esquema. Por defecto el backend usa `LP2` / `admin123` en `localhost:1522/XE`.

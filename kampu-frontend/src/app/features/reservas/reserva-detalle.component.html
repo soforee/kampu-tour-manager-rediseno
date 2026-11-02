@@ -106,7 +106,7 @@
             <div class="grid sm:grid-cols-6 gap-3">
               <div class="sm:col-span-2">
                 <label class="label req">Monto</label>
-                <input type="number" min="0" step="0.01" class="field" [(ngModel)]="monto" placeholder="0.00">
+                <input type="number" min="0" step="0.01" class="field" [(ngModel)]="monto" placeholder="0.00" (blur)="v.tocar('monto')" [class.field-invalid]="v.error('monto')" kpFiltro="decimal" inputmode="decimal">@if (v.error('monto'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
               <div>
                 <label class="label req">Moneda</label>
@@ -122,7 +122,7 @@
               </div>
               <div class="sm:col-span-3">
                 <label class="label">Código de transacción <span class="opt">Opcional</span></label>
-                <input class="field" maxlength="100" [(ngModel)]="codigo" placeholder="Opcional (se genera si lo dejas vacío)">
+                <input class="field" maxlength="100" [(ngModel)]="codigo" placeholder="Opcional (se genera si lo dejas vacío)" (blur)="v.tocar('codigo')" [class.field-invalid]="v.error('codigo')" kpFiltro="codigo">@if (v.error('codigo'); as e) { <p class="field-error">{{ e }}</p> }
               </div>
               <div class="sm:col-span-3">
                 <label class="label req">Estado</label>
@@ -139,7 +139,7 @@
               </div>
               <div class="flex gap-2">
                 <button type="button" class="btn-light" (click)="usarSaldo()"><app-icon name="wallet" size="w-4 h-4" /> Usar saldo</button>
-                <button type="button" class="btn-brand" [disabled]="!monto || monto <= 0" (click)="registrarPago()"><app-icon name="check" size="w-4 h-4" /> Registrar</button>
+                <button type="button" class="btn-brand" [disabled]="store.ocupado()" (click)="registrarPago()"><app-icon name="check" size="w-4 h-4" /> Registrar</button>
               </div>
             </div>
           </div>

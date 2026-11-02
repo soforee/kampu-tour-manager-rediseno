@@ -65,15 +65,15 @@
       <div class="form-section">
         @if (tab() === 'guias') {
           <div class="form-section-title"><app-icon name="user" size="w-4 h-4" /> Datos del guía</div>
-          <div><label class="label req">Nombre completo</label><input class="field" maxlength="150" [(ngModel)]="guia.nombreCompleto"></div>
-          <div><label class="label">Especialidad <span class="opt">Opcional</span></label><input class="field" maxlength="100" [(ngModel)]="guia.especialidad" placeholder="Aventura y trekking…"></div>
-          <div><label class="label">Teléfono <span class="opt">Opcional</span></label><input class="field" maxlength="20" [(ngModel)]="guia.telefono" placeholder="+51 9xx xxx xxx"></div>
+          <div><label class="label req">Nombre completo</label><input class="field" maxlength="150" [(ngModel)]="guia.nombreCompleto" (blur)="v.tocar('gNombre')" [class.field-invalid]="v.error('gNombre')" kpFiltro="nombre">@if (v.error('gNombre'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div><label class="label">Especialidad <span class="opt">Opcional</span></label><input class="field" maxlength="100" [(ngModel)]="guia.especialidad" placeholder="Aventura y trekking…" (blur)="v.tocar('gEspecialidad')" [class.field-invalid]="v.error('gEspecialidad')">@if (v.error('gEspecialidad'); as e) { <p class="field-error">{{ e }}</p> }</div>
+          <div><label class="label">Teléfono <span class="opt">Opcional</span></label><input class="field" maxlength="20" [(ngModel)]="guia.telefono" placeholder="+51 9xx xxx xxx" (blur)="v.tocar('gTelefono')" [class.field-invalid]="v.error('gTelefono')" type="tel" kpFiltro="telefono" inputmode="tel">@if (v.error('gTelefono'); as e) { <p class="field-error">{{ e }}</p> }</div>
         } @else {
           <div class="form-section-title"><app-icon name="truck" size="w-4 h-4" /> Datos de la unidad</div>
-          <div><label class="label">Marca / modelo <span class="opt">Opcional</span></label><input class="field" maxlength="100" [(ngModel)]="transp.marcaModelo" placeholder="Toyota Hiace…"></div>
+          <div><label class="label">Marca / modelo <span class="opt">Opcional</span></label><input class="field" maxlength="100" [(ngModel)]="transp.marcaModelo" placeholder="Toyota Hiace…" (blur)="v.tocar('tMarca')" [class.field-invalid]="v.error('tMarca')">@if (v.error('tMarca'); as e) { <p class="field-error">{{ e }}</p> }</div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label class="label req">Placa</label><input class="field font-mono" maxlength="15" [(ngModel)]="transp.placa" placeholder="ABC-123"></div>
-            <div><label class="label req">Capacidad</label><input type="number" min="1" max="999" class="field" [(ngModel)]="transp.capacidad"><p class="hint">Entre 1 y 999 pasajeros.</p></div>
+            <div><label class="label req">Placa</label><input class="field font-mono" maxlength="15" [(ngModel)]="transp.placa" placeholder="ABC-123" (blur)="v.tocar('tPlaca')" [class.field-invalid]="v.error('tPlaca')" kpFiltro="placa">@if (v.error('tPlaca'); as e) { <p class="field-error">{{ e }}</p> }</div>
+            <div><label class="label req">Capacidad</label><input type="number" min="1" max="999" class="field" [(ngModel)]="transp.capacidad" (blur)="v.tocar('tCapacidad')" [class.field-invalid]="v.error('tCapacidad')" kpFiltro="entero" inputmode="numeric" step="1">@if (v.error('tCapacidad'); as e) { <p class="field-error">{{ e }}</p> }@if (!v.error('tCapacidad')) { <p class="hint">Entre 1 y 999 pasajeros.</p> }</div>
           </div>
         }
       </div>

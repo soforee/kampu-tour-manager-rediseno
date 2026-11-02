@@ -19,6 +19,11 @@ spring:
         dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
 
+  jackson:
+    deserialization:
+      # 1.5 en un campo entero (días, cupos, capacidad…) se rechaza en vez de truncarse a 1
+      accept-float-as-int: false
+
   servlet:
     multipart:
       max-file-size: 10MB
