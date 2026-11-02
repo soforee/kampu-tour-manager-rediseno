@@ -14,8 +14,9 @@ proyecto/
 Esta versión solo cambia la **apariencia** del frontend (`kampu-frontend`). El backend, la base de datos, la API,
 los servicios, las rutas y la lógica de los componentes son los mismos.
 
+- **Identidad visual**: nuevo logotipo Kampu (isotipo "K" atravesada por un camino + wordmark con hoja) en `src/app/shared/logo.component.*` y como favicon.
 - **Sistema de diseño** (`src/index.html` + `src/styles.css`): esquinas redondeadas, sombras suaves, paleta KAMPU
-  (verde bosque, oliva y arena) y clases reutilizables: `btn-dark` (principal), `btn-brand` (guardar/confirmar),
+  del logotipo (verde oliva `#4B5B1D`, hoja lima `#C4BD45` y fondo crema), tipografía Nunito y clases reutilizables: `btn-dark` (principal), `btn-brand` (guardar/confirmar),
   `btn-light` (secundario/cancelar), `btn-danger` (eliminar/anular), `icon-btn*`, `field`, `label`/`label req`,
   `form-section`, `form-actions`, `card`, `tbl`, `seg`/`seg-btn` (filtros), `alert-*`, `empty`, `progress`, `chip`.
 - **Barra lateral fija y compacta**: en escritorio muestra solo los iconos y se expande suavemente al pasar el cursor

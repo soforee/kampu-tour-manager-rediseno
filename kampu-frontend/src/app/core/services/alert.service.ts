@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
 
-const BRAND = '#1F3D2B';
+const BRAND = '#4B5B1D';
 const DANGER = '#E11D48';
-const CANCEL = '#FFFDF8'; // botón secundario claro (ver estilos .swal2-cancel en styles.css)
+const CANCEL = '#FFFEF8'; // botón secundario claro (ver estilos .swal2-cancel en styles.css)
 
 @Injectable({ providedIn: 'root' })
 export class AlertService {
